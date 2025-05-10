@@ -1,0 +1,184 @@
+Making a docker MySQL container to access the Rfm database
+
+C:\Windows\System32>docker run -it --rm mysql mysql --host=mysql-rfam-public.ebi.ac.uk --port=4497 --user=rfamro --database=Rfam
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 51220
+Server version: 5.6.36-log MySQL Community Server (GPL)
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+a)
+
+mysql> select count(distinct species) from taxonomy where species like '%tiger%';
++-------------------------+
+| count(distinct species) |
++-------------------------+
+|                     411 |
++-------------------------+
+1 row in set (0.570 sec)
+
+
+
+mysql> select ncbi_id, species from taxonomy where species like '%Sumatran tiger%';
++---------+-------------------------------------------+
+| ncbi_id | species                                   |
++---------+-------------------------------------------+
+|    9695 | Panthera tigris sumatrae (Sumatran tiger) |
++---------+-------------------------------------------+
+1 row in set (0.400 sec)
+
+
+
+
+
+b)
+
+
+mysql> desc family;
++----------------------+------------------+------+-----+-------------------+-----------------------------+
+| Field                | Type             | Null | Key | Default           | Extra                       |
++----------------------+------------------+------+-----+-------------------+-----------------------------+
+| rfam_acc             | varchar(7)       | NO   | PRI | NULL              |                             |
+| rfam_id              | varchar(40)      | NO   | MUL | NULL              |                             |
+| auto_wiki            | int(10) unsigned | NO   | MUL | NULL              |                             |
+| description          | varchar(75)      | YES  |     | NULL              |                             |
+| author               | tinytext         | YES  |     | NULL              |                             |
+| seed_source          | tinytext         | YES  |     | NULL              |                             |
+| gathering_cutoff     | double(5,2)      | YES  |     | NULL              |                             |
+| trusted_cutoff       | double(5,2)      | YES  |     | NULL              |                             |
+| noise_cutoff         | double(5,2)      | YES  |     | NULL              |                             |
+| comment              | longtext         | YES  |     | NULL              |                             |
+| previous_id          | tinytext         | YES  |     | NULL              |                             |
+| cmbuild              | tinytext         | YES  |     | NULL              |                             |
+| cmcalibrate          | tinytext         | YES  |     | NULL              |                             |
+| cmsearch             | tinytext         | YES  |     | NULL              |                             |
+| num_seed             | bigint(20)       | YES  |     | NULL              |                             |
+| num_full             | bigint(20)       | YES  |     | NULL              |                             |
+| num_genome_seq       | bigint(20)       | YES  |     | NULL              |                             |
+| num_refseq           | bigint(20)       | YES  |     | NULL              |                             |
+| type                 | varchar(50)      | YES  |     | NULL              |                             |
+| structure_source     | tinytext         | YES  |     | NULL              |                             |
+| number_of_species    | bigint(20)       | YES  |     | NULL              |                             |
+| number_3d_structures | int(11)          | YES  |     | NULL              |                             |
+| num_pseudonokts      | int(11)          | YES  |     | NULL              |                             |
+| tax_seed             | mediumtext       | YES  |     | NULL              |                             |
+| ecmli_lambda         | double(10,5)     | YES  |     | NULL              |                             |
+| ecmli_mu             | double(10,5)     | YES  |     | NULL              |                             |
+| ecmli_cal_db         | mediumint(9)     | YES  |     | 0                 |                             |
+| ecmli_cal_hits       | mediumint(9)     | YES  |     | 0                 |                             |
+| maxl                 | mediumint(9)     | YES  |     | 0                 |                             |
+| clen                 | mediumint(9)     | YES  |     | 0                 |                             |
+| match_pair_node      | tinyint(1)       | YES  |     | 0                 |                             |
+| hmm_tau              | double(10,5)     | YES  |     | NULL              |                             |
+| hmm_lambda           | double(10,5)     | YES  |     | NULL              |                             |
+| created              | datetime         | NO   |     | NULL              |                             |
+| updated              | timestamp        | NO   |     | CURRENT_TIMESTAMP | on update CURRENT_TIMESTAMP |
++----------------------+------------------+------+-----+-------------------+-----------------------------+
+35 rows in set (0.182 sec)
+
+mysql> desc rfamseq;
++--------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+-----+---------+-------+
+| Field        | Type                                                                                                                                                                                                                                                                                            | Null | Key | Default | Extra |
++--------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+-----+---------+-------+
+| rfamseq_acc  | varchar(25)                                                                                                                                                                                                                                                                                     | NO   | PRI |         |       |
+| accession    | varchar(25)                                                                                                                                                                                                                                                                                     | NO   |     |         |       |
+| version      | int(6) unsigned zerofill                                                                                                                                                                                                                                                                        | NO   | MUL | NULL    |       |
+| ncbi_id      | int(10) unsigned                                                                                                                                                                                                                                                                                | NO   | MUL | NULL    |       |
+| mol_type     | enum('protein','genomic DNA','DNA','ss-DNA','RNA','genomic RNA','ds-RNA','ss-cRNA','ss-RNA','mRNA','tRNA','rRNA','snoRNA','snRNA','scRNA','pre-RNA','other RNA','other DNA','unassigned DNA','unassigned RNA','viral cRNA','cRNA','transcribed RNA','ncRNA','ribozyme','antisense_RNA','other') | NO   |     | NULL    |       |
+| length       | int(10) unsigned                                                                                                                                                                                                                                                                                | YES  |     | 0       |       |
+| description  | varchar(250)                                                                                                                                                                                                                                                                                    | NO   |     |         |       |
+| previous_acc | mediumtext                                                                                                                                                                                                                                                                                      | YES  |     | NULL    |       |
+| source       | char(20)                                                                                                                                                                                                                                                                                        | NO   |     | NULL    |       |
++--------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------+-----+---------+-------+
+9 rows in set (0.178 sec)
+
+
+mysql> desc  clan ;
++-------------+--------------+------+-----+---------+-------+
+| Field       | Type         | Null | Key | Default | Extra |
++-------------+--------------+------+-----+---------+-------+
+| clan_acc    | varchar(7)   | NO   | PRI | NULL    |       |
+| id          | varchar(40)  | YES  |     | NULL    |       |
+| previous_id | tinytext     | YES  |     | NULL    |       |
+| description | varchar(100) | YES  |     | NULL    |       |
+| author      | tinytext     | YES  |     | NULL    |       |
+| comment     | longtext     | YES  |     | NULL    |       |
+| created     | datetime     | NO   |     | NULL    |       |
+| updated     | timestamp    | NO   |     | NULL    |       |
++-------------+--------------+------+-----+---------+-------+
+8 rows in set (0.182 sec)
+
+
+mysql> desc  clan_membership ;
++----------+------------+------+-----+---------+-------+
+| Field    | Type       | Null | Key | Default | Extra |
++----------+------------+------+-----+---------+-------+
+| clan_acc | varchar(7) | NO   | MUL | NULL    |       |
+| rfam_acc | varchar(7) | NO   | PRI | NULL    |       |
++----------+------------+------+-----+---------+-------+
+
+
+mysql> desc  taxonomy;
++--------------------+------------------+------+-----+---------+-------+
+| Field              | Type             | Null | Key | Default | Extra |
++--------------------+------------------+------+-----+---------+-------+
+| ncbi_id            | int(10) unsigned | NO   | PRI | 0       |       |
+| species            | varchar(100)     | NO   | MUL |         |       |
+| tax_string         | mediumtext       | YES  |     | NULL    |       |
+| tree_display_name  | varchar(100)     | YES  |     | NULL    |       |
+| align_display_name | varchar(112)     | YES  |     | NULL    |       |
++--------------------+------------------+------+-----+---------+-------+
+5 rows in set (0.180 sec)
+
+
+So here I am going to use the main 5TABLES and after seeing the structure of each of them here are the connections:
+clan and clan_membership are connected using clan_acc
+family and clan_membership are connected using rfam_acc
+taxonomy and rfamseq are connected using ncbi_id
+
+
+c
+
+
+mysql> select t.species, max(r.length) as max_length from taxonomy t join rfamseq r on t.ncbi_id = r.ncbi_id where t.species like 'oryza%' and r.mol_type in ('genomic dna', 'dna') group by t.species order by max_length desc limit 1;
++-----------------+------------+
+| species         | max_length |
++-----------------+------------+
+| Oryza granulata |   80745213 |
++-----------------+------------+
+1 row in set (4.079 sec)
+
+
+d
+
+mysql> select f.rfam_acc, f.rfam_id, max(r.length) as max_length from family f join full_region fr on f.rfam_acc = fr.rfam_acc join rfamseq r on fr.rfamseq_acc = r.rfamseq_acc join taxonomy t on r.ncbi_id = t.ncbi_id where t.species like 'oryza%' and r.mol_type in ('genomic dna', 'dna') and r.length > 1000000 group by f.rfam_acc, f.rfam_id order by max_length desc limit 15 offset 120;
++----------+-------------+------------+
+| rfam_acc | rfam_id     | max_length |
++----------+-------------+------------+
+| RF01855  | Plant_SRP   |   71071801 |
+| RF01848  | ACEA_U3     |   71071801 |
+| RF03709  | MIR1878     |   71071801 |
+| RF01424  | snoR118     |   71071801 |
+| RF03896  | MIR2275     |   71071801 |
+| RF01847  | Plant_U3    |   71071801 |
+| RF00328  | snoZ161_228 |   71071801 |
+| RF00695  | MIR398      |   64488131 |
+| RF00135  | snoZ223     |   64488131 |
+| RF01431  | snoR135     |   64488131 |
+| RF01427  | snoR127     |   64488131 |
+| RF04071  | MIR2863     |   64488131 |
+| RF04248  | MIR7486     |   64488131 |
+| RF01215  | snoR97      |   58352620 |
+| RF00690  | MIR408      |   58352620 |
++----------+-------------+------------+
+15 rows in set (1.057 sec)
+
